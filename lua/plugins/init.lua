@@ -16,6 +16,11 @@ return {
   -- test new blink
   -- { import = "nvchad.blink.lazyspec" },
 
+  -- NvChad v2.5 calls require("nvim-treesitter.configs"), which only exists on
+  -- the frozen `master` branch. Upstream's default branch is now `main` (a
+  -- rewrite without that module), so an unpinned install/update breaks startup.
+  { "nvim-treesitter/nvim-treesitter", branch = "master" },
+
   -- {
   -- 	"nvim-treesitter/nvim-treesitter",
   -- 	opts = {
