@@ -16,10 +16,26 @@ return {
   -- test new blink
   -- { import = "nvchad.blink.lazyspec" },
 
-  -- NvChad v2.5 calls require("nvim-treesitter.configs"), which only exists on
-  -- the frozen `master` branch. Upstream's default branch is now `main` (a
-  -- rewrite without that module), so an unpinned install/update breaks startup.
-  { "nvim-treesitter/nvim-treesitter", branch = "master" },
+  -- nvim-treesitter `main` (master is archived). NvChad v2.5's own config calls
+  -- the master-only require("nvim-treesitter.configs"), so it is replaced here.
+  -- main needs nvim >= 0.12 and tree-sitter-cli >= 0.26.1, and does not lazy-load.
+  {
+    "nvim-treesitter/nvim-treesitter",
+    branch = "main",
+    lazy = false,
+    build = ":TSUpdate",
+    config = function(_, opts)
+      require("nvim-treesitter").install(opts.ensure_installed)
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("treesitter_start", { clear = true }),
+        callback = function(args)
+          if pcall(vim.treesitter.start, args.buf) then
+            vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end
+        end,
+      })
+    end,
+  },
 
   -- {
   -- 	"nvim-treesitter/nvim-treesitter",
